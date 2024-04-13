@@ -1,4 +1,4 @@
-import { UserTable } from "@/config/db/table/user";
+import { UserTable } from "@/config/db/table/users";
 import { BaseModel } from "./base.model";
 
 export class User extends BaseModel implements UserTable {
