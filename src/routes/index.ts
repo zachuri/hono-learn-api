@@ -7,4 +7,7 @@ export const defaultRoutes = [
 		path: `${base_path}/products`,
 		route: productRoute,
 	},
+  {
+    path: `/${base_path}/users`,
+  }
 ];
