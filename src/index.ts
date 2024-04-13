@@ -1,37 +1,29 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { errorHandler } from "@/middlewares/error";
+import { defaultRoutes } from "@/routes";
+import { Environment } from "@/types/bindings";
+import { ApiError } from "@/utils/ApiError";
+import { sentry } from "@hono/sentry";
 import { Hono } from "hono";
-import { products } from './db/schema';
+import { cors } from "hono/cors";
+import httpStatus from "http-status";
 
-export type Env = {
-	DATABASE_URL: string;
-	MY_VAR: string;
-};
+const app = new Hono<Environment>();
 
-const app = new Hono<{ Bindings: Env }>();
+app.use("*", sentry());
+app.use("*", cors());
+
+app.notFound(() => {
+	throw new ApiError(httpStatus.NOT_FOUND, "Not found");
+});
+
+app.onError(errorHandler);
 
 app.get("/", c => {
 	return c.text("Hello Hono!");
 });
 
-app.get("/customers", c => {
-	const secret = c.env.MY_VAR;
-	return c.json([{ id: 1, name: secret }]);
-});
-
-app.get("/customers/:id", c => {
-	const customerId = c.req.param("id");
-
-	return c.json([{ id: customerId, name: `Customer: ${customerId}` }]);
-});
-
-app.get("/products", async c => {
-	const sql = neon(c.env.DATABASE_URL);
-	const db = drizzle(sql);
-
-	const allProducts = await db.select().from(products);
-
-	return c.json(allProducts);
+defaultRoutes.forEach(route => {
+	app.route(`${route.path}`, route.route);
 });
 
 export default app;
