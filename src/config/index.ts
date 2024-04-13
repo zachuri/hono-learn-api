@@ -11,16 +11,16 @@ const envVarsSchema = z.object({
 		z.literal("test"),
 	]),
 	DATABASE_URL: z.string(),
-	// // JWT secret key
-	// JWT_SECRET: z.string(),
-	// // Minutes after which access tokens expire
-	// JWT_ACCESS_EXPIRATION_MINUTES: z.coerce.number().default(30),
-	// // Days after which refresh tokens expire
-	// JWT_REFRESH_EXPIRATION_DAYS: z.coerce.number().default(30),
-	// // Minutes after which reset password token expires
-	// JWT_RESET_PASSWORD_EXPIRATION_MINUTES: z.coerce.number().default(10),
-	// // Minutes after which verify email token expires
-	// JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: z.coerce.number().default(10),
+	// JWT secret key
+	JWT_SECRET: z.string(),
+	// Minutes after which access tokens expire
+	JWT_ACCESS_EXPIRATION_MINUTES: z.coerce.number().default(30),
+	// Days after which refresh tokens expire
+	JWT_REFRESH_EXPIRATION_DAYS: z.coerce.number().default(30),
+	// Minutes after which reset password token expires
+	JWT_RESET_PASSWORD_EXPIRATION_MINUTES: z.coerce.number().default(10),
+	// Minutes after which verify email token expires
+	JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: z.coerce.number().default(10),
 	// AWS_ACCESS_KEY_ID: z.string(),
 	// AWS_SECRET_ACCESS_KEY: z.string(),
 	// AWS_REGION: z.string(),
@@ -51,13 +51,13 @@ export interface Config {
 	database: {
 		url: string;
 	};
-	// jwt: {
-	// 	secret: string;
-	// 	accessExpirationMinutes: number;
-	// 	refreshExpirationDays: number;
-	// 	resetPasswordExpirationMinutes: number;
-	// 	verifyEmailExpirationMinutes: number;
-	// };
+	jwt: {
+		secret: string;
+		accessExpirationMinutes: number;
+		refreshExpirationDays: number;
+		resetPasswordExpirationMinutes: number;
+		verifyEmailExpirationMinutes: number;
+	};
 	// aws: {
 	// 	accessKeyId: string;
 	// 	secretAccessKey: string;
@@ -126,14 +126,14 @@ export const getConfig = (env: Environment["Bindings"]) => {
 		database: {
 			url: envVars.DATABASE_URL,
 		},
-		// jwt: {
-		// 	secret: envVars.JWT_SECRET,
-		// 	accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
-		// 	refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
-		// 	resetPasswordExpirationMinutes:
-		// 		envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
-		// 	verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
-		// },
+		jwt: {
+			secret: envVars.JWT_SECRET,
+			accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
+			refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
+			resetPasswordExpirationMinutes:
+				envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
+			verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+		},
 		// aws: {
 		// 	accessKeyId: envVars.AWS_ACCESS_KEY_ID,
 		// 	secretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
