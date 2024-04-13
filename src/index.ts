@@ -18,10 +18,6 @@ app.notFound(() => {
 
 app.onError(errorHandler);
 
-app.get("/", c => {
-	return c.text("Hello Hono!");
-});
-
 defaultRoutes.forEach(route => {
 	app.route(`${route.path}`, route.route);
 });
