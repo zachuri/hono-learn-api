@@ -1,18 +1,9 @@
 import { Config } from "@/config";
 import { Role } from "@/config/roles";
 import { TokenType, tokenTypes } from "@/config/tokens";
-import jwt from "@tsndr/cloudflare-worker-jwt";
+import jwt, { JwtPayload } from "@tsndr/cloudflare-worker-jwt";
 import dayjs, { Dayjs } from "dayjs";
 import { User } from "../models/user.model";
-
-type Token = {
-	userId: string,
-	type: TokenType,
-	role: Role,
-	expires: Dayjs,
-	secret: string,
-	isEmailVerified: Date | null
-}
 
 export const generateToken = async (
 	userId: string,
@@ -82,7 +73,7 @@ export const verifyToken = async (
 	if (!isValid) {
 		throw new Error("Token not valid");
 	}
-	const decoded = jwt.decode<Token>(token);
+	const decoded = jwt.decode<JwtPayload & {type : string}>(token);
 	if (!decoded || !decoded.payload) {
 		throw new Error("Payload not found in token");
 	}
