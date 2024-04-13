@@ -1,7 +1,7 @@
 import { Config } from "@/config";
 import { getDBClient } from "@/config/db";
 import { users } from "@/config/db/schema";
-import { Role } from "@/config/role";
+import { Role } from "@/config/roles";
 import { User } from "@/models/user.model";
 import { ApiError } from "@/utils/ApiError";
 import { Register } from "@/validations/auth.validation";
