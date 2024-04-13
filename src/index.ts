@@ -18,6 +18,10 @@ app.notFound(() => {
 
 app.onError(errorHandler);
 
+app.get("/", c => {
+	return c.json("My First Hono API");
+});
+
 defaultRoutes.forEach(route => {
 	app.route(`${route.path}`, route.route);
 });
