@@ -1,4 +1,4 @@
-import { Config } from "@/config/config";
+import { Config } from '@/config';
 import { getDBClient } from "@/config/db";
 import { Product, products } from "@/models/product.model";
 
