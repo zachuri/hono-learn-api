@@ -1,4 +1,4 @@
-import { getConfig } from "@/config/config";
+import { getConfig } from "@/config";
 import * as productService from "@/services/product.service";
 import { Environment } from "@/types/bindings";
 import { Handler } from "hono";
