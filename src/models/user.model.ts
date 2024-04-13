@@ -1,5 +1,6 @@
 import { UserTable } from "@/config/db/table/users";
 import { BaseModel } from "./base.model";
+import bcrypt from 'bcryptjs'
 
 export class User extends BaseModel implements UserTable {
 	id: string;
@@ -36,7 +37,7 @@ export class User extends BaseModel implements UserTable {
 
 	isPasswordMatch = async (userPassword: string): Promise<boolean> => {
 		if (!this.password) throw "No password connected to user";
-		return await Bun.password.verify(userPassword, this.password);
+		return await bcrypt.compare(userPassword, this.password)
 	};
 
 	canAccessPrivateFields(): boolean {

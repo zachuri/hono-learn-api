@@ -9,6 +9,8 @@
     "@hono/sentry": "^1.0.1",
     "@neondatabase/serverless": "^0.9.0",
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.7",

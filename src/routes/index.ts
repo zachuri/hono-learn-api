@@ -9,7 +9,7 @@ export const defaultRoutes = [
 		route: productRoute,
 	},
 	{
-		path: `/${base_path}/auth`,
+		path: `${base_path}/auth`,
 		route: authRoute,
 	},
 	// {
