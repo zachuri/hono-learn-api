@@ -1,3 +1,11 @@
-import { products } from '@/config/db/schema';
+import { doublePrecision, pgTable, serial, text } from "drizzle-orm/pg-core";
+
+export const products = pgTable("products", {
+	id: serial("id").primaryKey(),
+	name: text("name"),
+	description: text("description"),
+	price: doublePrecision("price"),
+});
+
 
 export type Product = typeof products.$inferSelect;

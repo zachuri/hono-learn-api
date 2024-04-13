@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240403.0",
-    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.20.14",
     "tsx": "^4.7.2",
     "wrangler": "^3.47.0"
