@@ -4,7 +4,7 @@ const base_path = "v1";
 
 export const defaultRoutes = [
 	{
-		path: `/${base_path}/products`,
+		path: `${base_path}/products`,
 		route: productRoute,
 	},
 ];

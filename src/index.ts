@@ -23,7 +23,7 @@ app.get("/", c => {
 });
 
 defaultRoutes.forEach(route => {
-	app.route(`${route.path}`, route.route);
+	app.route(`/api/${route.path}`, route.route);
 });
 
 export default app;
