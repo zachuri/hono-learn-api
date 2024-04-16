@@ -1,7 +1,6 @@
 import { getConfig } from "@/config";
 import * as authService from "@/services/auth.service";
 import * as tokenService from "@/services/token.service";
-import * as userService from "@/services/user.service";
 import { Environment } from "@/types/bindings";
 import * as authValidation from "@/validations/auth.validation";
 import { Handler } from "hono";
@@ -38,27 +37,27 @@ export const refreshTokens: Handler<Environment> = async c => {
 	return c.json({ ...tokens }, httpStatus.OK as StatusCode);
 };
 
-export const sendVerificationEmail: Handler<Environment> = async c => {
-	const config = getConfig(c.env);
-	const payload = c.get("payload");
-	const userId = String(payload.sub);
-	// Don't let bad actors know if the email is registered by returning an error if the email
-	// is already verified
-	try {
-		const user = await userService.getUserById(userId, config.database);
-		if (!user || user.is_email_verified) {
-			throw new Error();
-		}
-		const verifyEmailToken = await tokenService.generateVerifyEmailToken(
-			user,
-			config.jwt
-		);
-		await emailService.sendVerificationEmail(
-			user.email,
-			{ name: user.name || "", token: verifyEmailToken },
-			config
-		);
-	} catch (err) {}
-	c.status(httpStatus.NO_CONTENT as StatusCode);
-	return c.body(null);
-};
+// export const sendVerificationEmail: Handler<Environment> = async c => {
+// 	const config = getConfig(c.env);
+// 	const payload = c.get("payload");
+// 	const userId = String(payload.sub);
+// 	// Don't let bad actors know if the email is registered by returning an error if the email
+// 	// is already verified
+// 	try {
+// 		const user = await userService.getUserById(userId, config.database);
+// 		if (!user || user.is_email_verified) {
+// 			throw new Error();
+// 		}
+// 		const verifyEmailToken = await tokenService.generateVerifyEmailToken(
+// 			user,
+// 			config.jwt
+// 		);
+// 		await emailService.sendVerificationEmail(
+// 			user.email,
+// 			{ name: user.name || "", token: verifyEmailToken },
+// 			config
+// 		);
+// 	} catch (err) {}
+// 	c.status(httpStatus.NO_CONTENT as StatusCode);
+// 	return c.body(null);
+// };
