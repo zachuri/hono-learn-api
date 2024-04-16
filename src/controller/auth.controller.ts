@@ -24,3 +24,11 @@ export const login: Handler<Environment> = async (c) => {
   const tokens = await tokenService.generateAuthTokens(user, config.jwt)
   return c.json({ user, tokens }, httpStatus.OK as StatusCode)
 }
+
+export const refreshTokens: Handler<Environment> = async (c) => {
+  const config = getConfig(c.env)
+  const bodyParse = await c.req.json()
+  const { refresh_token } = authValidation.refreshTokens.parse(bodyParse)
+  const tokens = await authService.refreshAuth(refresh_token, config)
+  return c.json({ ...tokens }, httpStatus.OK as StatusCode)
+}

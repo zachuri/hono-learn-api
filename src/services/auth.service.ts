@@ -9,6 +9,9 @@ import { CreateUser } from "@/validations/user.validation";
 import { eq } from "drizzle-orm";
 import httpStatus from "http-status";
 
+import { tokenTypes } from "@/config/tokens";
+import { TokenResponse } from "@/models/token.model";
+import * as tokenService from "@/services/token.service";
 import * as userService from "@/services/user.service";
 
 export const register = async (
@@ -48,6 +51,29 @@ export const loginUserWithEmailAndPassword = async (
 		throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
 	}
 	return user;
+};
+
+export const refreshAuth = async (
+	refreshToken: string,
+	config: Config
+): Promise<TokenResponse> => {
+	try {
+		const refreshTokenDoc = await tokenService.verifyToken(
+			refreshToken,
+			tokenTypes.REFRESH,
+			config.jwt.secret
+		);
+		const user = await userService.getUserById(
+			String(refreshTokenDoc.sub),
+			config.database
+		);
+		if (!user) {
+			throw new Error();
+		}
+		return tokenService.generateAuthTokens(user, config.jwt);
+	} catch (error) {
+		throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
+	}
 };
 
 export const createUser = async (
