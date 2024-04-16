@@ -15,3 +15,12 @@ export const register: Handler<Environment> = async c => {
 	const tokens = await tokenService.generateAuthTokens(user, config.jwt);
 	return c.json({ user, tokens }, httpStatus.CREATED as StatusCode);
 };
+
+export const login: Handler<Environment> = async (c) => {
+  const config = getConfig(c.env)
+  const bodyParse = await c.req.json()
+  const { email, password } = authValidation.login.parse(bodyParse)
+  const user = await authService.loginUserWithEmailAndPassword(email, password, config.database)
+  const tokens = await tokenService.generateAuthTokens(user, config.jwt)
+  return c.json({ user, tokens }, httpStatus.OK as StatusCode)
+}

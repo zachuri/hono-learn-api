@@ -9,6 +9,8 @@ import { CreateUser } from "@/validations/user.validation";
 import { eq } from "drizzle-orm";
 import httpStatus from "http-status";
 
+import * as userService from "@/services/user.service";
+
 export const register = async (
 	body: Register,
 	databaseConfig: Config["database"]
@@ -27,6 +29,25 @@ export const register = async (
 	const newUser = await createUser(registerBody, databaseConfig);
 
 	return newUser;
+};
+
+export const loginUserWithEmailAndPassword = async (
+	email: string,
+	password: string,
+	databaseConfig: Config["database"]
+): Promise<User> => {
+	const user = await userService.getUserByEmail(email, databaseConfig);
+	// If password is null then the user must login with a social account
+	if (user && !user.password) {
+		throw new ApiError(
+			httpStatus.UNAUTHORIZED,
+			"Please login with your social account"
+		);
+	}
+	if (!user || !(await user.isPasswordMatch(password))) {
+		throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+	}
+	return user;
 };
 
 export const createUser = async (
