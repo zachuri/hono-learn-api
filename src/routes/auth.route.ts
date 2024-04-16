@@ -1,4 +1,6 @@
 import * as authController from "@/controller/auth.controller";
+import { auth } from "@/middlewares/auth";
+import { rateLimit } from "@/middlewares/rateLimiter";
 import { Environment } from "@/types/bindings";
 import { Hono } from "hono";
 
@@ -11,6 +13,7 @@ route.post("/register", authController.register);
 route.post("/login", authController.login);
 
 route.post("/refresh-tokens", authController.refreshTokens);
+
 // route.post('/forgot-password', authController.forgotPassword)
 // route.post('/reset-password', authController.resetPassword)
 // route.post(
