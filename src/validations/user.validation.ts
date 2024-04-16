@@ -7,7 +7,7 @@ export const createUser = z.strictObject({
 	email: z.string().email(),
 	password: z.string().superRefine(password).transform(hashPassword),
 	name: z.string(),
-	is_email_verified: z.date(),
+	is_email_verified: z.date().nullable(),
 	role: roleZodType,
 	image: z.string(),
 	username: z.string(),

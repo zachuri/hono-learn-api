@@ -18,7 +18,7 @@ export const register = async (
 	const registerBody = {
 		...body,
 		role: "user" as Role,
-		is_email_verified: new Date(),
+		is_email_verified: null,
 		image: "",
 		username: "",
 		phone_number: "",
