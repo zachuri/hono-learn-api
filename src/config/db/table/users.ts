@@ -17,19 +17,19 @@ export const users = pgTable(
 		id: text("id").notNull().primaryKey().$defaultFn(nanoid),
 		name: text("name"),
 		email: text("email").notNull(),
-		is_email_verified: timestamp("is_email_verified", { mode: "date" }),
+		isEmailVerified: timestamp("is_email_verified", { mode: "date" }),
 		image: text("image"),
 		role: roleEnum("role").notNull().default("user"),
 		password: varchar("password", { length: 510 }),
 		username: varchar("username", { length: 60 }),
-		phone_number: varchar("phone_number", { length: 20 }),
+		phoneNumber: varchar("phone_number", { length: 20 }),
 		created_at: timestamp("created_at", { mode: "string" })
 			.notNull()
 			.defaultNow(),
 	},
 	t => ({
-		phone_number_idx: index("phone_number_idx").on(t.phone_number),
-		email_idx: index("email_idx").on(t.email),
+		phoneNumberIdx: index("phone_number_idx").on(t.phoneNumber),
+		emailIdx: index("email_idx").on(t.email),
 	})
 );
 

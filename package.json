@@ -2,13 +2,14 @@
 	"scripts": {
 		"dev": "wrangler dev src/index.ts",
 		"deploy": "wrangler deploy --minify src/index.ts",
-		"db:generate": "drizzle-kit generate:pg --schema=./src/config/db/schema.ts",
+		"db:generate": "drizzle-kit generate",
 		"db:migrate": "tsx ./src/config/db/migrate.ts",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
 		"@hono/sentry": "^1.0.1",
+		"@lucia-auth/adapter-drizzle": "^1.0.7",
 		"@neondatabase/serverless": "^0.9.0",
 		"@tsndr/cloudflare-worker-jwt": "^2.5.3",
 		"@types/bcryptjs": "^2.4.6",
@@ -18,6 +19,7 @@
 		"drizzle-orm": "latest",
 		"hono": "^4.2.3",
 		"http-status": "^1.7.4",
+		"lucia": "^3.2.0",
 		"nanoid": "^5.0.7",
 		"pg": "^8.11.5",
 		"tsx": "^4.7.2",

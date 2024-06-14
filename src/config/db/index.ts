@@ -3,6 +3,7 @@ import { drizzle, NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Config } from '..';
 import * as schema from '@/config/db/schema'
 import { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from 'drizzle-orm';
+import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 
 export const getDBClient = (
 	databaseConfig: Config["database"]
@@ -42,3 +43,4 @@ export type InferQueryModel<
     with: With;
   }
 >;
+
