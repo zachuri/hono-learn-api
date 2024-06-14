@@ -21,9 +21,9 @@ const envVarsSchema = z.object({
 	JWT_RESET_PASSWORD_EXPIRATION_MINUTES: z.coerce.number().default(10),
 	// Minutes after which verify email token expires
 	JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: z.coerce.number().default(10),
-	AWS_ACCESS_KEY_ID: z.string(),
-	AWS_SECRET_ACCESS_KEY: z.string(),
-	AWS_REGION: z.string(),
+	// AWS_ACCESS_KEY_ID: z.string(),
+	// AWS_SECRET_ACCESS_KEY: z.string(),
+	// AWS_REGION: z.string(),
 	// EMAIL_SENDER: z.string(),
 	// OAUTH_GITHUB_CLIENT_ID: z.string(),
 	// OAUTH_GITHUB_CLIENT_SECRET: z.string(),
