@@ -1,12 +1,13 @@
 import { Database } from "@/config/db";
 import { UserTable } from "@/config/db/schema";
-import { DatabaseUserAttributes, initializeLucia } from "@/config/lucia";
+import { DatabaseUserAttributes } from "@/config/lucia";
 import type { JwtPayload } from "@tsndr/cloudflare-worker-jwt";
 import { Lucia, Session, User } from "lucia";
 import type { Toucan } from "toucan-js";
 
 export type Environment = {
 	Bindings: {
+		WEB_DOMAIN: string;
 		ENV: string;
 		JWT_SECRET: string;
 		JWT_ACCESS_EXPIRATION_MINUTES: number;
@@ -44,7 +45,7 @@ export type Environment = {
 	};
 	Variables: {
 		db: Database;
-		user: (User & UserTable) | null;
+		user: (User & DatabaseUserAttributes) | null;
 		session: Session | null;
 		lucia: Lucia<DatabaseUserAttributes>;
 		payload: JwtPayload;

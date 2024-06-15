@@ -1,40 +1,52 @@
-import { getConfig } from "@/config";
-import { initializeLucia } from "@/config/db/lucia";
+import type { Context } from "hono";
+import { env } from "hono/adapter";
+import type { User } from "lucia";
+import { verifyRequestOrigin } from "lucia";
+
+import { DatabaseUserAttributes } from "@/config/lucia";
 import { Environment } from "@/types/bindings";
-import { JwtPayload } from '@tsndr/cloudflare-worker-jwt';
-import { MiddlewareHandler } from "hono";
-import { getCookie } from "hono/cookie";
-import httpStatus from "http-status";
-import { Permission } from "../config/roles";
-import { ApiError } from "../utils/ApiError";
 
+export const AuthMiddleware = async (
+	c: Context<Environment>,
+	next: () => Promise<void>
+) => {
+	if (c.req.path.startsWith("/auth")) {
+		return next();
+	}
+	const lucia = c.get("lucia");
 
-export const auth =
-	(...requiredRights: Permission[]): MiddlewareHandler<Environment> =>
-	async (c, next) => {
-		const config = getConfig(c.env);
-		const lucia = initializeLucia(config.database);
+	const originHeader = c.req.header("Origin") ?? c.req.header("origin");
+	const hostHeader = c.req.header("Host") ?? c.req.header("X-Forwarded-Host");
+	if (
+		(!originHeader ||
+			!hostHeader ||
+			!verifyRequestOrigin(originHeader, [hostHeader, env(c).WEB_DOMAIN])) &&
+		env(c).WORKER_ENV === "production" &&
+		c.req.method !== "GET"
+	) {
+		return new Response(null, {
+			status: 403,
+		});
+	}
 
-		const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
-
-		if (!sessionId) {
-			c.set("payload", null);
-      c.set('')
-			return next();
-		}
-
-		const credentials = c.req.header("Authorization");
-
-		if (!credentials) {
-			throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
-		}
-
-		const parts = credentials.split(/\s+/);
-		if (parts.length !== 2) {
-			throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
-		}
-	};
-
+	const authorizationHeader = c.req.header("Authorization");
+	const bearerSessionId = lucia.readBearerToken(authorizationHeader ?? "");
+	const sessionId = bearerSessionId;
+	if (!sessionId) {
+		return new Response("Unauthorized", { status: 401 });
+	}
+	const { session, user } = await lucia.validateSession(sessionId);
+	if (!session) {
+		return new Response("Unauthorized", { status: 401 });
+	}
+	if (session?.fresh) {
+		const sessionCookie = lucia.createSessionCookie(session.id);
+		c.header("Set-Cookie", sessionCookie.serialize());
+	}
+	c.set("user", user as User & DatabaseUserAttributes);
+	c.set("session", session);
+	await next();
+};
 // import { getConfig } from "@/config";
 // import { Environment } from "@/types/bindings";
 // import jwt, { JwtPayload } from "@tsndr/cloudflare-worker-jwt";

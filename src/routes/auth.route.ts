@@ -1,5 +1,4 @@
 import * as authController from "@/controller/auth.controller";
-import { auth } from "@/middlewares/auth";
 import { rateLimit } from "@/middlewares/rateLimiter";
 import { Environment } from "@/types/bindings";
 import { Hono } from "hono";

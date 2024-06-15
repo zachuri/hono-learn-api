@@ -1,6 +1,6 @@
 import { getConfig } from "@/config";
-import * as authService from "@/services/auth.service";
-import * as tokenService from "@/services/token.service";
+// import * as authService from "@/services/auth.service";
+// import * as tokenService from "@/services/token.service";
 import { Environment } from "@/types/bindings";
 import * as authValidation from "@/validations/auth.validation";
 import { Handler } from "hono";
@@ -11,30 +11,30 @@ export const register: Handler<Environment> = async c => {
 	const config = getConfig(c.env);
 	const bodyParse = await c.req.json();
 	const body = await authValidation.register.parseAsync(bodyParse);
-	const user = await authService.register(body, config.database);
-	const tokens = await tokenService.generateAuthTokens(user, config.jwt);
-	return c.json({ user, tokens }, httpStatus.CREATED as StatusCode);
+	// const user = await authService.register(body, config.database);
+	// const tokens = await tokenService.generateAuthTokens(user, config.jwt);
+	// return c.json({ user, tokens }, httpStatus.CREATED as StatusCode);
 };
 
 export const login: Handler<Environment> = async c => {
 	const config = getConfig(c.env);
 	const bodyParse = await c.req.json();
 	const { email, password } = authValidation.login.parse(bodyParse);
-	const user = await authService.loginUserWithEmailAndPassword(
-		email,
-		password,
-		config.database
-	);
-	const tokens = await tokenService.generateAuthTokens(user, config.jwt);
-	return c.json({ user, tokens }, httpStatus.OK as StatusCode);
+	// const user = await authService.loginUserWithEmailAndPassword(
+	// 	email,
+	// 	password,
+	// 	config.database
+	// );
+	// const tokens = await tokenService.generateAuthTokens(user, config.jwt);
+	// return c.json({ user, tokens }, httpStatus.OK as StatusCode);
 };
 
 export const refreshTokens: Handler<Environment> = async c => {
-	const config = getConfig(c.env);
-	const bodyParse = await c.req.json();
-	const { refresh_token } = authValidation.refreshTokens.parse(bodyParse);
-	const tokens = await authService.refreshAuth(refresh_token, config);
-	return c.json({ ...tokens }, httpStatus.OK as StatusCode);
+	// const config = getConfig(c.env);
+	// const bodyParse = await c.req.json();
+	// const { refresh_token } = authValidation.refreshTokens.parse(bodyParse);
+	// const tokens = await authService.refreshAuth(refresh_token, config);
+	// return c.json({ ...tokens }, httpStatus.OK as StatusCode);
 };
 
 // export const sendVerificationEmail: Handler<Environment> = async c => {
