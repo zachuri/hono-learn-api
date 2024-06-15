@@ -1,12 +1,20 @@
 import * as schema from "@/config/db/schema";
+import { Environment } from "@/types/bindings";
 import { neon } from "@neondatabase/serverless";
 import {
 	BuildQueryResult,
 	DBQueryConfig,
 	ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { drizzle, NeonHttpDatabase } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/neon-http";
+import { NeonDatabase } from "drizzle-orm/neon-serverless";
+import { Context } from "hono";
 import { Config } from "..";
+
+export const initalizeDB = (c: Context<Environment>) => {
+	const client = neon(c.env.DATABASE_URL);
+	return drizzle(client, { schema });
+};
 
 export const getDBClient = (databaseConfig: Config["database"]) => {
 	const client = neon(databaseConfig.url);
@@ -45,4 +53,4 @@ export type InferQueryModel<
 	}
 >;
 
-export type Database = NeonHttpDatabase<typeof schema>;
+export type Database = NeonDatabase<typeof schema>;

@@ -7,7 +7,7 @@ import { users, UserTable } from "./db/schema";
 import { sessions } from "./db/table/session";
 
 // Import the Lucia type with the UserTable generic parameter
-import { InferInsertModel } from "drizzle-orm";
+import { InferInsertModel } from 'drizzle-orm';
 import type { Lucia as LuciaType } from "lucia";
 
 export const initializeLucia = (

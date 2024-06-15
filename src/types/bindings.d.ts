@@ -51,10 +51,9 @@ export type Environment = {
 		sentry: Toucan;
 	};
 };
-
 declare module "lucia" {
 	interface Register {
-		Lucia: ReturnType<typeof initializeLucia>;
+		// Lucia: ReturnType<typeof initializeLucia>;
 		DatabaseUserAttributes: UserTable;
 	}
 }

@@ -7,6 +7,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
+import { initalizeDB } from "./config/db";
 import { initializeLucia } from "./config/lucia";
 
 const app = new Hono<Environment>();
@@ -20,7 +21,7 @@ app
 	})
 	.onError(errorHandler)
 	.use((c, next) => {
-		// initalizeDB(c);
+		initalizeDB(c);
 		initializeLucia(c);
 		return next();
 	});
