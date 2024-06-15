@@ -7,18 +7,23 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
+import { initializeLucia } from "./config/lucia";
 
 const app = new Hono<Environment>();
 
-app.use("*", sentry());
-app.use("*", cors());
-app.use("*", logger());
-
-app.notFound(() => {
-	throw new ApiError(httpStatus.NOT_FOUND, "Not found");
-});
-
-app.onError(errorHandler);
+app
+	.use("*", sentry())
+	.use("*", cors())
+	.use("*", logger())
+	.notFound(() => {
+		throw new ApiError(httpStatus.NOT_FOUND, "Not found");
+	})
+	.onError(errorHandler)
+	.use((c, next) => {
+		// initalizeDB(c);
+		initializeLucia(c);
+		return next();
+	});
 
 app.get("/", c => {
 	return c.json("My First Hono API");

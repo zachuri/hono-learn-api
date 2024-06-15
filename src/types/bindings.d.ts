@@ -1,7 +1,11 @@
+import { Database } from "@/config/db";
+import { UserTable } from "@/config/db/schema";
+import { DatabaseUserAttributes, initializeLucia } from "@/config/lucia";
 import type { JwtPayload } from "@tsndr/cloudflare-worker-jwt";
+import { Lucia, Session, User } from "lucia";
 import type { Toucan } from "toucan-js";
 
-type Environment = {
+export type Environment = {
 	Bindings: {
 		ENV: string;
 		JWT_SECRET: string;
@@ -39,7 +43,18 @@ type Environment = {
 		OAUTH_APPLE_REDIRECT_URL: string;
 	};
 	Variables: {
+		db: Database;
+		user: (User & UserTable) | null;
+		session: Session | null;
+		lucia: Lucia<DatabaseUserAttributes>;
 		payload: JwtPayload;
 		sentry: Toucan;
 	};
 };
+
+declare module "lucia" {
+	interface Register {
+		Lucia: ReturnType<typeof initializeLucia>;
+		DatabaseUserAttributes: UserTable;
+	}
+}
