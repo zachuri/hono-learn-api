@@ -1,16 +1,30 @@
+import { AppContext } from "@/context";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+import { InferInsertModel } from "drizzle-orm";
+import { Context } from "hono";
+import { env } from "hono/adapter";
 import { Lucia } from "lucia";
-import { getDBClient } from ".";
-import { Config } from "..";
-import { users, UserTable } from "./schema";
-import { sessions } from "./table/session";
+import { sessionTable, UserTable, userTable } from "./schema";
 
-export const initializeLucia = (databaseConfig: Config["database"]) => {
-	const db = getDBClient(databaseConfig);
+export const initializeLucia = (c: Context<AppContext>) => {
+	let lucia = c.get("lucia");
 
-	const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
+	if (lucia) {
+		return lucia;
+	}
 
-	return new Lucia(adapter, {
+	const adapter = new DrizzlePostgreSQLAdapter(
+		c.env.DB,
+		sessionTable,
+		userTable
+	);
+
+	lucia = new Lucia(adapter, {
+		sessionCookie: {
+			attributes: {
+				secure: env(c).WORKER_ENV !== "development",
+			},
+		},
 		getUserAttributes: attributes => {
 			return {
 				id: attributes,
@@ -21,7 +35,12 @@ export const initializeLucia = (databaseConfig: Config["database"]) => {
 			};
 		},
 	});
+	c.set("lucia", lucia);
+	return lucia;
 };
+
+export type DatabaseUserAttributes = InferInsertModel<typeof userTable>;
+
 
 declare module "lucia" {
 	interface Register {

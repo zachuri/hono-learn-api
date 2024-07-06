@@ -1,10 +1,8 @@
+import { AppContext } from "@/context";
 import * as authController from "@/controller/auth.controller";
-import { auth } from "@/middlewares/auth";
-import { rateLimit } from "@/middlewares/rateLimiter";
-import { Environment } from "@/types/bindings";
 import { Hono } from "hono";
 
-export const route = new Hono<Environment>();
+export const route = new Hono<AppContext>();
 
 const twoMinutes = 120;
 const oneRequest = 1;
