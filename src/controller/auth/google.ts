@@ -7,7 +7,6 @@ import type { DatabaseUserAttributes } from "@/config//lucia";
 import { oauthAccountTable } from "@/config/db/table/oauth.account";
 import { userTable } from "@/config/db/table/users";
 import type { AppContext } from "@/context";
-import { nanoid } from "nanoid";
 
 const googleClient = (c: Context<AppContext>) =>
 	new Google(
@@ -80,8 +79,8 @@ export const createGoogleSession = async ({
 	}
 	if (existingUser?.emailVerified && user.email_verified && !existingAccount) {
 		await c.get("db").insert(oauthAccountTable).values({
-			providerUserId: user.sub,
 			provider: "google",
+			providerUserId: user.sub,
 			userId: existingUser.id,
 		});
 		const session = await c.get("lucia").createSession(existingUser.id, {});
@@ -94,7 +93,7 @@ export const createGoogleSession = async ({
 			.createSession(existingAccount.userId, {});
 		return session;
 	} else {
-		const userId = nanoid();
+		const userId = generateId(15);
 		let username = user.name;
 		const existingUsername = await c.get("db").query.userTable.findFirst({
 			where: (u, { eq }) => eq(u.username, username),
@@ -109,7 +108,7 @@ export const createGoogleSession = async ({
 				id: userId,
 				username,
 				email: user.email,
-				isEmailVerified: user.email_verified ? new Date() : null,
+				emailVerified: user.email_verified ? 1 : 0,
 				image: user.picture,
 			});
 		await c.get("db").insert(oauthAccountTable).values({

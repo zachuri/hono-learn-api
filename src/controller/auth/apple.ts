@@ -110,7 +110,7 @@ export const createAppleSession = async ({
 		}
 	}
 	if (
-		existingUser?.isEmailVerified &&
+		existingUser?.emailVerified &&
 		payload.email_verified &&
 		!existingAccount
 	) {
@@ -144,7 +144,7 @@ export const createAppleSession = async ({
 				id: userId,
 				username,
 				email: payload.email,
-				isEmailVerified: payload.email_verified ? new Date() : null,
+				emailVerified: payload.email_verified ? 1 : 0,
 				image: null,
 			});
 

@@ -7,7 +7,6 @@ import type { DatabaseUserAttributes } from "@/config//lucia";
 import { oauthAccountTable } from "@/config/db/table/oauth.account";
 import { userTable } from "@/config/db/table/users";
 import type { AppContext } from "@/context";
-import { nanoid } from "nanoid";
 
 const githubClient = (c: Context<AppContext>) =>
 	new GitHub(env(c).GITHUB_CLIENT_ID, env(c).GITHUB_CLIENT_SECRET);
@@ -86,7 +85,7 @@ export const createGithubSession = async ({
 		}
 	}
 	if (
-		existingUser?.isEmailVerified &&
+		existingUser?.emailVerified &&
 		primaryEmail.verified &&
 		!existingAccount
 	) {
@@ -105,7 +104,7 @@ export const createGithubSession = async ({
 			.createSession(existingAccount.userId, {});
 		return session;
 	} else {
-		const userId = nanoid();
+		const userId = generateId(15);
 		let username = githubUserResult.login;
 		const existingUsername = await c.get("db").query.userTable.findFirst({
 			where: (u, { eq }) => eq(u.username, username),
@@ -121,7 +120,7 @@ export const createGithubSession = async ({
 				username,
 				image: githubUserResult.avatar_url,
 				email: primaryEmail.email ?? "",
-				isEmailVerified: primaryEmail.verified ? new Date() : null,
+				emailVerified: primaryEmail.verified ? 1 : 0,
 			});
 		await c.get("db").insert(oauthAccountTable).values({
 			providerUserId: githubUserResult.id.toString(),

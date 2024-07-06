@@ -1,12 +1,12 @@
 import {
 	index,
+	integer,
 	pgEnum,
 	pgTable,
 	text,
 	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { nanoid } from "nanoid";
 
 export const ALL_ROLES = ["user", "admin"] as const;
 export const roleEnum = pgEnum("role", ALL_ROLES);
@@ -14,10 +14,10 @@ export const roleEnum = pgEnum("role", ALL_ROLES);
 export const userTable = pgTable(
 	"user",
 	{
-		id: text("id").notNull().primaryKey().$defaultFn(nanoid),
+		id: text("id").notNull().primaryKey(),
 		name: text("name"),
 		email: text("email").notNull(),
-		isEmailVerified: timestamp("is_email_verified", { mode: "date" }),
+		emailVerified: integer("email_verified").notNull(),
 		image: text("image"),
 		role: roleEnum("role").notNull().default("user"),
 		username: varchar("username", { length: 60 }),
