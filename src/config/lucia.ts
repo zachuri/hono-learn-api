@@ -4,7 +4,7 @@ import { InferInsertModel } from "drizzle-orm";
 import { Context } from "hono";
 import { env } from "hono/adapter";
 import { Lucia } from "lucia";
-import { sessionTable, userTable } from "./schema";
+import { sessionTable, userTable } from "./db/schema";
 
 // @ts-ignore
 export const initializeLucia = (c: Context<AppContext>) => {

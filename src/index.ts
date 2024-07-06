@@ -7,7 +7,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
 import { initalizeDB } from "./config/db";
-import { initializeLucia } from "./config/db/lucia";
+import { initializeLucia } from "./config/lucia";
 import { AppContext } from "./context";
 
 const app = new Hono<AppContext>();
