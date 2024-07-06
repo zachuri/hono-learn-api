@@ -31,7 +31,7 @@ export const initializeLucia = (c: Context<AppContext>) => {
 				id: attributes,
 				username: attributes.username,
 				email: attributes.email,
-				isEmailVerified: attributes.isEmailVerified,
+				emailVerified: attributes.emailVerified,
 				image: attributes.image,
 			};
 		},
