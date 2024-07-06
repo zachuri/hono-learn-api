@@ -6,6 +6,7 @@ import { env } from "hono/adapter";
 import { Lucia } from "lucia";
 import { sessionTable, userTable } from "./schema";
 
+// @ts-ignore
 export const initializeLucia = (c: Context<AppContext>) => {
 	let lucia = c.get("lucia");
 
