@@ -1,17 +1,15 @@
-import { AppContext } from "@/context";
-import * as authController from "@/controller/auth.controller";
-import { Hono } from "hono";
+// import { AppContext } from "@/context";
+// import * as authController from "@/controller/auth.controller";
+// import { Hono } from "hono";
 
-export const route = new Hono<AppContext>();
+// export const route = new Hono<AppContext>();
 
-const twoMinutes = 120;
-const oneRequest = 1;
+// route.post("/:provider", authController.provider);
 
-route.post("/register", authController.register);
-route.post("/login", authController.login);
-
-route.post("/refresh-tokens", authController.refreshTokens);
-
+// const twoMinutes = 120;
+// const oneRequest = 1;
+// route.post("/refresh-tokens", authController.refreshTokens);
+// route.post("/register", authController.register);
 // route.post('/forgot-password', authController.forgotPassword)
 // route.post('/reset-password', authController.resetPassword)
 // route.post(

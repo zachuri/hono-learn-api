@@ -1,14 +1,13 @@
-import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import type { Context } from "hono";
 
 import { AppContext } from "@/context";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
+import { NeonDatabase } from "drizzle-orm/neon-serverless";
 import * as schema from "./schema";
-import { NeonDatabase } from 'drizzle-orm/neon-serverless';
 
 export const initalizeDB = (c: Context<AppContext>) => {
-	const client = neon(c.env.DB);
+	const client = neon(c.env.DATABASE_URL);
 	return drizzle(client, { schema });
 };
 
