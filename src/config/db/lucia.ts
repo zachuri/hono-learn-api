@@ -4,7 +4,7 @@ import { InferInsertModel } from "drizzle-orm";
 import { Context } from "hono";
 import { env } from "hono/adapter";
 import { Lucia } from "lucia";
-import { sessionTable, UserTable, userTable } from "./schema";
+import { sessionTable, userTable } from "./schema";
 
 export const initializeLucia = (c: Context<AppContext>) => {
 	let lucia = c.get("lucia");
@@ -14,7 +14,7 @@ export const initializeLucia = (c: Context<AppContext>) => {
 	}
 
 	const adapter = new DrizzlePostgreSQLAdapter(
-		c.env.DB,
+		c.get("db"),
 		sessionTable,
 		userTable
 	);
@@ -40,11 +40,3 @@ export const initializeLucia = (c: Context<AppContext>) => {
 };
 
 export type DatabaseUserAttributes = InferInsertModel<typeof userTable>;
-
-
-declare module "lucia" {
-	interface Register {
-		Lucia: ReturnType<typeof initializeLucia>;
-		DatabaseUserAttributes: UserTable;
-	}
-}
