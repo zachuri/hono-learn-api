@@ -8,9 +8,18 @@ import { verifyRequestOrigin } from "lucia";
 import { z } from "zod";
 
 import type { AppContext } from "@/context";
-import { createAppleSession, getAppleAuthorizationUrl } from "../controller/auth/apple";
-import { createGithubSession, getGithubAuthorizationUrl } from "./github";
-import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";
+import {
+	createAppleSession,
+	getAppleAuthorizationUrl,
+} from "@/controller/auth/apple";
+import {
+	createGithubSession,
+	getGithubAuthorizationUrl,
+} from "@/controller/auth/github";
+import {
+	createGoogleSession,
+	getGoogleAuthorizationUrl,
+} from "@/controller/auth/google";
 
 const authRoute = new Hono<AppContext>()
 	.get(
@@ -266,4 +275,4 @@ const authRoute = new Hono<AppContext>()
 		return c.json(null, 200);
 	});
 
-export { AuthController };
+export { authRoute };

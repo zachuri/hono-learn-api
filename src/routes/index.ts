@@ -1,4 +1,4 @@
-import { route as authRoute } from "@/routes/auth.route";
+import { authRoute } from "@/routes/auth.route";
 
 const base_path = "v1";
 

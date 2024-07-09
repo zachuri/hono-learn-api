@@ -12,7 +12,7 @@ import { createAppleSession, getAppleAuthorizationUrl } from "./apple";
 import { createGithubSession, getGithubAuthorizationUrl } from "./github";
 import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";
 
-const authRoute = new Hono<AppContext>()
+const AuthController = new Hono<AppContext>()
 	.get(
 		"/:provider",
 		zValidator(
