@@ -1,43 +1,41 @@
 {
-  "scripts": {
-    "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx ./src/config/db/migrate.ts",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
-  },
-  "dependencies": {
-    "@hono/sentry": "^1.0.1",
-    "@hono/swagger-ui": "^0.3.0",
-    "@hono/zod-openapi": "^0.14.7",
-    "@lucia-auth/adapter-drizzle": "^1.0.7",
-    "@neondatabase/serverless": "^0.9.0",
-    "@tsndr/cloudflare-worker-jwt": "^2.5.3",
-    "@types/bcryptjs": "^2.4.6",
-    "arctic": "^1.9.1",
-    "bcryptjs": "^2.4.3",
-    "dayjs": "^1.11.10",
-    "dotenv": "^16.4.5",
-    "drizzle-orm": "latest",
-    "hono": "^4.2.3",
-    "http-status": "^1.7.4",
-    "lucia": "^3.2.0",
-    "pg": "^8.11.5",
-    "tsx": "^4.7.2",
-    "zod": "^3.22.4",
-    "zod-error": "^1.5.0"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240403.0",
-    "@types/bun": "latest",
-    "drizzle-kit": "latest",
-    "wrangler": "^3.47.0"
-  },
-  "name": "hono-learn-api",
-  "module": "index.ts",
-  "type": "module",
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  }
+	"scripts": {
+		"dev": "wrangler dev src/index.ts",
+		"deploy": "wrangler deploy --minify src/index.ts",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "tsx ./src/config/db/migrate.ts",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio"
+	},
+	"dependencies": {
+		"@hono/sentry": "^1.0.1",
+		"@hono/swagger-ui": "^0.3.0",
+		"@hono/zod-openapi": "^0.14.7",
+		"@lucia-auth/adapter-drizzle": "^1.0.7",
+		"@neondatabase/serverless": "^0.9.0",
+		"@tsndr/cloudflare-worker-jwt": "^2.5.3",
+		"arctic": "^1.9.1",
+		"dayjs": "^1.11.10",
+		"dotenv": "^16.4.5",
+		"drizzle-orm": "latest",
+		"hono": "^4.2.3",
+		"http-status": "^1.7.4",
+		"lucia": "^3.2.0",
+		"pg": "^8.11.5",
+		"tsx": "^4.7.2",
+		"zod": "^3.22.4",
+		"zod-error": "^1.5.0"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20240403.0",
+		"@types/bun": "latest",
+		"drizzle-kit": "latest",
+		"wrangler": "^3.47.0"
+	},
+	"name": "hono-learn-api",
+	"module": "index.ts",
+	"type": "module",
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	}
 }
