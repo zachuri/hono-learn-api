@@ -4,9 +4,9 @@ import type { Context } from "hono";
 import { env } from "hono/adapter";
 import { generateId } from "lucia";
 
-import type { AppContext } from "@/context";
 import { oauthAccountTable } from "@/db/table/oauth.account";
 import { userTable } from "@/db/table/users";
+import type { AppContext } from "@/utils/context";
 import type { DatabaseUserAttributes } from "@/utils/lucia";
 
 const appleClient = (c: Context<AppContext>) =>
@@ -132,7 +132,7 @@ export const createAppleSession = async ({
 		const userId = generateId(15);
 		let username = user?.username ?? generateId(10);
 		const existingUsername = await c.get("db").query.userTable.findFirst({
-			where: (u: { username: any; }, { eq }: any) => eq(u.username, username),
+			where: (u: { username: any }, { eq }: any) => eq(u.username, username),
 		});
 		if (existingUsername) {
 			username = `${username}-${generateId(5)}`;

@@ -7,7 +7,7 @@ import type { Session } from "lucia";
 import { verifyRequestOrigin } from "lucia";
 import { z } from "zod";
 
-import type { AppContext } from "../../context";
+import type { AppContext } from "../../utils/context";
 import { createAppleSession, getAppleAuthorizationUrl } from "./apple";
 import { createGithubSession, getGithubAuthorizationUrl } from "./github";
 import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";

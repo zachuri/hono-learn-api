@@ -3,9 +3,9 @@ import type { Context } from "hono";
 import { env } from "hono/adapter";
 import { generateId } from "lucia";
 
-import type { AppContext } from "@/context";
 import { oauthAccountTable } from "@/db/table/oauth.account";
 import { userTable } from "@/db/table/users";
+import type { AppContext } from "@/utils/context";
 import type { DatabaseUserAttributes } from "@/utils/lucia";
 
 const githubClient = (c: Context<AppContext>) =>

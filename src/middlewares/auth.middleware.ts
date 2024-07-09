@@ -4,7 +4,7 @@ import type { User } from "lucia";
 import { verifyRequestOrigin } from "lucia";
 
 import type { DatabaseUserAttributes } from "@/utils/lucia";
-import type { AppContext } from "../context";
+import type { AppContext } from "../utils/context";
 
 export const AuthMiddleware = async (
 	c: Context<AppContext>,
