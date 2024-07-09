@@ -2,7 +2,7 @@ import authRoute from "@/routes/auth/index";
 
 const base_path = "v1";
 
-export const defaultRoutes = [
+export const routes = [
 	{
 		path: `${base_path}/auth`,
 		route: authRoute,
