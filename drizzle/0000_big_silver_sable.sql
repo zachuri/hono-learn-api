@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text NOT NULL,
-	"is_email_verified" timestamp,
+	"email_verified" integer NOT NULL,
 	"image" text,
 	"role" "role" DEFAULT 'user' NOT NULL,
 	"username" varchar(60),
