@@ -3,10 +3,10 @@ import type { Context } from "hono";
 import { env } from "hono/adapter";
 import { generateId } from "lucia";
 
-import type { DatabaseUserAttributes } from "@/config//lucia";
-import { oauthAccountTable } from "@/config/db/table/oauth.account";
-import { userTable } from "@/config/db/table/users";
 import type { AppContext } from "@/context";
+import { oauthAccountTable } from "@/db/table/oauth.account";
+import { userTable } from "@/db/table/users";
+import type { DatabaseUserAttributes } from "@/utils/lucia";
 
 const githubClient = (c: Context<AppContext>) =>
 	new GitHub(env(c).GITHUB_CLIENT_ID, env(c).GITHUB_CLIENT_SECRET);
@@ -67,7 +67,7 @@ export const createGithubSession = async ({
 		return null;
 	}
 	const existingAccount = await c.get("db").query.oauthAccountTable.findFirst({
-		where: (account, { eq }) =>
+		where: (account: { providerUserId: any }, { eq }: any) =>
 			eq(account.providerUserId, githubUserResult.id.toString()),
 	});
 	let existingUser: DatabaseUserAttributes | null = null;
@@ -78,7 +78,8 @@ export const createGithubSession = async ({
 		}
 	} else {
 		const response = await c.get("db").query.userTable.findFirst({
-			where: (u, { eq }) => eq(u.email, primaryEmail.email),
+			where: (u: { email: any }, { eq }: any) =>
+				eq(u.email, primaryEmail.email),
 		});
 		if (response) {
 			existingUser = response;
@@ -107,7 +108,7 @@ export const createGithubSession = async ({
 		const userId = generateId(15);
 		let username = githubUserResult.login;
 		const existingUsername = await c.get("db").query.userTable.findFirst({
-			where: (u, { eq }) => eq(u.username, username),
+			where: (u: { username: any }, { eq }: any) => eq(u.username, username),
 		});
 		if (existingUsername) {
 			username = `${username}-${generateId(5)}`;

@@ -1,10 +1,10 @@
 import { AppContext } from "@/context";
+import { sessionTable, userTable } from "@/db/schema";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { InferInsertModel } from "drizzle-orm";
 import { Context } from "hono";
 import { env } from "hono/adapter";
 import { Lucia } from "lucia";
-import { sessionTable, userTable } from "./db/schema";
 
 // @ts-ignore
 export const initializeLucia = (c: Context<AppContext>) => {

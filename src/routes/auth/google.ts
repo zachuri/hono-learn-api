@@ -3,10 +3,10 @@ import type { Context } from "hono";
 import { env } from "hono/adapter";
 import { generateId } from "lucia";
 
-import type { DatabaseUserAttributes } from "@/config//lucia";
-import { oauthAccountTable } from "@/config/db/table/oauth.account";
-import { userTable } from "@/config/db/table/users";
 import type { AppContext } from "@/context";
+import { oauthAccountTable } from "@/db/table/oauth.account";
+import { userTable } from "@/db/table/users";
+import type { DatabaseUserAttributes } from "@/utils/lucia";
 
 const googleClient = (c: Context<AppContext>) =>
 	new Google(

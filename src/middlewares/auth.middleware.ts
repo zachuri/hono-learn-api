@@ -3,7 +3,7 @@ import { env } from "hono/adapter";
 import type { User } from "lucia";
 import { verifyRequestOrigin } from "lucia";
 
-import type { DatabaseUserAttributes } from "@/config/lucia";
+import type { DatabaseUserAttributes } from "@/utils/lucia";
 import type { AppContext } from "../context";
 
 export const AuthMiddleware = async (

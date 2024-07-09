@@ -1,3 +1,5 @@
+import { AppContext } from "@/context";
+import { initalizeDB } from "@/db";
 import { AuthMiddleware } from "@/middlewares/auth.middleware";
 import { errorHandler } from "@/middlewares/error";
 import { routes } from "@/routes";
@@ -7,9 +9,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
-import { initalizeDB } from "./config/db";
-import { initializeLucia } from "./config/lucia";
-import { AppContext } from "./context";
+import { initializeLucia } from "./utils/lucia";
 
 const app = new Hono<AppContext>();
 
