@@ -12,88 +12,91 @@ import { createAppleSession, getAppleAuthorizationUrl } from "./apple";
 import { createGithubSession, getGithubAuthorizationUrl } from "./github";
 import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";
 
-const AuthController = new Hono<AppContext>()
-	.get(
-		"/:provider",
-		zValidator(
-			"param",
-			z.object({ provider: z.enum(["github", "google", "apple"]) })
-		),
-		zValidator(
-			"query",
-			z
-				.object({
-					redirect: z.enum([
-						"com.expoluciaauth.app://",
-						"http://localhost:3000",
-						"https://expo-lucia-auth-example-web.pages.dev",
-					]),
-					sessionToken: z.string().optional(),
-				})
-				.default({ redirect: "http://localhost:3000" })
-		),
-		async c => {
-			const provider = c.req.valid("param").provider;
-			const redirect = c.req.valid("query").redirect;
-			const sessionToken = c.req.valid("query").sessionToken;
-			setCookie(c, "redirect", redirect, {
+const app = new Hono<AppContext>();
+
+app.get(
+	"/:provider",
+	zValidator(
+		"param",
+		z.object({ provider: z.enum(["github", "google", "apple"]) })
+	),
+	zValidator(
+		"query",
+		z
+			.object({
+				redirect: z.enum([
+					"com.expoluciaauth.app://",
+					"http://localhost:3000",
+					"https://expo-lucia-auth-example-web.pages.dev",
+				]),
+				sessionToken: z.string().optional(),
+			})
+			.default({ redirect: "http://localhost:3000" })
+	),
+	async c => {
+		const provider = c.req.valid("param").provider;
+		const redirect = c.req.valid("query").redirect;
+		const sessionToken = c.req.valid("query").sessionToken;
+		setCookie(c, "redirect", redirect, {
+			httpOnly: true,
+			maxAge: 60 * 10,
+			path: "/",
+			secure: env(c).WORKER_ENV === "production",
+		});
+		if (sessionToken) {
+			const session = await c.get("lucia").validateSession(sessionToken);
+			if (session.user) {
+				// for account linking
+				setCookie(c, "sessionToken", sessionToken, {
+					httpOnly: true,
+					maxAge: 60 * 10, // 10 minutes
+					path: "/",
+					secure: env(c).WORKER_ENV === "production",
+				});
+			}
+		}
+		const state = generateState();
+		if (provider === "github") {
+			const url = await getGithubAuthorizationUrl({ c, state });
+			setCookie(c, "github_oauth_state", state, {
 				httpOnly: true,
 				maxAge: 60 * 10,
 				path: "/",
 				secure: env(c).WORKER_ENV === "production",
 			});
-			if (sessionToken) {
-				const session = await c.get("lucia").validateSession(sessionToken);
-				if (session.user) {
-					// for account linking
-					setCookie(c, "sessionToken", sessionToken, {
-						httpOnly: true,
-						maxAge: 60 * 10, // 10 minutes
-						path: "/",
-						secure: env(c).WORKER_ENV === "production",
-					});
-				}
-			}
-			const state = generateState();
-			if (provider === "github") {
-				const url = await getGithubAuthorizationUrl({ c, state });
-				setCookie(c, "github_oauth_state", state, {
-					httpOnly: true,
-					maxAge: 60 * 10,
-					path: "/",
-					secure: env(c).WORKER_ENV === "production",
-				});
-				return c.redirect(url.toString());
-			} else if (provider === "google") {
-				const codeVerifier = generateCodeVerifier();
-				const url = await getGoogleAuthorizationUrl({ c, state, codeVerifier });
-				setCookie(c, "google_oauth_state", state, {
-					httpOnly: true,
-					maxAge: 60 * 10,
-					path: "/",
-					secure: env(c).WORKER_ENV === "production",
-				});
-				setCookie(c, "google_oauth_code_verifier", codeVerifier, {
-					httpOnly: true,
-					maxAge: 60 * 10,
-					path: "/",
-					secure: env(c).WORKER_ENV === "production",
-				});
-				return c.redirect(url.toString());
-			} else if (provider === "apple") {
-				const url = await getAppleAuthorizationUrl({ c, state });
-				setCookie(c, "apple_oauth_state", state, {
-					httpOnly: true,
-					maxAge: 60 * 10,
-					path: "/",
-					secure: env(c).WORKER_ENV === "production",
-					sameSite: "None",
-				});
-				return c.redirect(url.toString());
-			}
-			return c.json({}, 400);
+			return c.redirect(url.toString());
+		} else if (provider === "google") {
+			const codeVerifier = generateCodeVerifier();
+			const url = await getGoogleAuthorizationUrl({ c, state, codeVerifier });
+			setCookie(c, "google_oauth_state", state, {
+				httpOnly: true,
+				maxAge: 60 * 10,
+				path: "/",
+				secure: env(c).WORKER_ENV === "production",
+			});
+			setCookie(c, "google_oauth_code_verifier", codeVerifier, {
+				httpOnly: true,
+				maxAge: 60 * 10,
+				path: "/",
+				secure: env(c).WORKER_ENV === "production",
+			});
+			return c.redirect(url.toString());
+		} else if (provider === "apple") {
+			const url = await getAppleAuthorizationUrl({ c, state });
+			setCookie(c, "apple_oauth_state", state, {
+				httpOnly: true,
+				maxAge: 60 * 10,
+				path: "/",
+				secure: env(c).WORKER_ENV === "production",
+				sameSite: "None",
+			});
+			return c.redirect(url.toString());
 		}
-	)
+		return c.json({}, 400);
+	}
+);
+
+app
 	.all(
 		"/:provider/callback",
 		zValidator(
@@ -252,18 +255,19 @@ const AuthController = new Hono<AppContext>()
 			}
 			return c.json({ token: session.id });
 		}
-	)
-	.post("/logout", async c => {
-		const authorizationHeader = c.req.header("Authorization");
-		const bearerSessionId = c
-			.get("lucia")
-			.readBearerToken(authorizationHeader ?? "");
-		const sessionId = bearerSessionId;
-		if (!sessionId) {
-			return c.json({ error: "Not logged in" }, 400);
-		}
-		await c.get("lucia").invalidateSession(sessionId);
-		return c.json(null, 200);
-	});
+	);
 
-export { AuthController };
+app.post("/logout", async c => {
+	const authorizationHeader = c.req.header("Authorization");
+	const bearerSessionId = c
+		.get("lucia")
+		.readBearerToken(authorizationHeader ?? "");
+	const sessionId = bearerSessionId;
+	if (!sessionId) {
+		return c.json({ error: "Not logged in" }, 400);
+	}
+	await c.get("lucia").invalidateSession(sessionId);
+	return c.json(null, 200);
+});
+
+export default app;
