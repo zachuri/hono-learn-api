@@ -1,9 +1,9 @@
-import { AppContext } from "@/context";
 import { initalizeDB } from "@/db";
 import { AuthMiddleware } from "@/middlewares/auth.middleware";
 import { errorHandler } from "@/middlewares/error";
 import { routes } from "@/routes";
 import { ApiError } from "@/utils/ApiError";
+import { AppContext } from "@/utils/context";
 import { sentry } from "@hono/sentry";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
