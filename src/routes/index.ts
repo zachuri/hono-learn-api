@@ -1,10 +1,9 @@
 import authRoute from "@/routes/auth/index";
 
-const base_path = "v1";
-
 export const routes = [
 	{
-		path: `${base_path}/auth`,
+    apiVersion: process.env.API_VERSION,
+		path: "/auth",
 		route: authRoute,
 	},
 	// {

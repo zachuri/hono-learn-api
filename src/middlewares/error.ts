@@ -1,5 +1,5 @@
-import { Environment } from "@/types/bindings";
 import { ApiError } from "@/utils/ApiError";
+import { AppContext } from "@/utils/context";
 import { generateZodErrorMessage } from "@/utils/zod";
 import { getSentry } from "@hono/sentry";
 import type { ErrorHandler } from "hono";
@@ -45,10 +45,10 @@ export const errorConverter = (err: unknown, sentry: Toucan): ApiError => {
 	return error as ApiError;
 };
 
-export const errorHandler: ErrorHandler<Environment> = async (err, c) => {
+export const errorHandler: ErrorHandler<AppContext> = async (err, c) => {
 	// Can't load config in case error is inside config so load env here and default
 	// to highest obscurity aka production if env is not set
-	const env = c.env.ENV || "production";
+	const env = c.env.WORKER_ENV || "production";
 	const sentry = getSentry(c);
 	const error = errorConverter(err, sentry);
 
