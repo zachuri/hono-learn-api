@@ -10,7 +10,7 @@ export const AuthMiddleware = async (
 	c: Context<AppContext>,
 	next: () => Promise<void>
 ) => {
-	if (c.req.path.startsWith("/auth")) {
+	if (c.req.path.startsWith("/api/auth")) {
 		return next();
 	}
 	const lucia = c.get("lucia");

@@ -5,7 +5,6 @@ import { routes } from "@/routes";
 import { ApiError } from "@/utils/ApiError";
 import { AppContext } from "@/utils/context";
 import { sentry } from "@hono/sentry";
-import { config } from "dotenv";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -21,7 +20,8 @@ app
 	.notFound(() => {
 		throw new ApiError(httpStatus.NOT_FOUND, "Not found");
 	})
-	.onError(errorHandler)	.use(AuthMiddleware)
+	.onError(errorHandler)
+	.use(AuthMiddleware)
 	.use((c, next) => {
 		initializeDB(c);
 		initializeLucia(c);
@@ -30,8 +30,6 @@ app
 	.get("/", c => {
 		return c.json("My First Hono API");
 	});
-
-const apiVersion = process.env.API_VERSION ?? "v1";
 
 routes.forEach(route => {
 	app.route(`/api/${route.path}`, route.route);

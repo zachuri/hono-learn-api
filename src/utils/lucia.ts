@@ -1,5 +1,5 @@
-import { AppContext } from "@/context";
 import { sessionTable, userTable } from "@/db/schema";
+import { AppContext } from "@/utils/context";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { InferInsertModel } from "drizzle-orm";
 import { Context } from "hono";

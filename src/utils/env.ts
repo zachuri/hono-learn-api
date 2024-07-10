@@ -12,4 +12,5 @@ export type Env = {
 	APPLE_KEY_ID: string;
 	API_DOMAIN: string;
 	WEB_DOMAIN: string;
+	RATE_LIMITER: DurableObjectNamespace;
 };
