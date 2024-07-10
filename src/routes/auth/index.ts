@@ -27,7 +27,7 @@ app.get(
 				redirect: z.enum([
 					"com.expoluciaauth.app://",
 					"http://localhost:3000",
-					"https://expo-lucia-auth-example-web.pages.dev",
+					"https://hono-learn-api.zachuri.workers.dev",
 				]),
 				sessionToken: z.string().optional(),
 			})
