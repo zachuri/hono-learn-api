@@ -32,7 +32,7 @@ app
 	});
 
 routes.forEach(route => {
-	app.route(`/api/${route.path}`, route.route);
+	app.route(`/api${route.path}`, route.route);
 });
 
 export type AppType = typeof routes;
