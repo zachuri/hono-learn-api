@@ -2,8 +2,21 @@ name = "hono-learn-api"
 compatibility_date = "2023-12-01"
 
 [vars]
-MY_VAR = "my-variable"
+API_DOMAIN = "http://localhost:8787"
+API_VERSION = "v1"
+APPLE_CLIENT_ID = "com.expoluciaauth.web"
+APPLE_KEY_ID = "YOUR_APPLE_KEY_ID"
+APPLE_PRIVATE_KEY = "YOUR_APPLE_PRIVATE_KEY"
+APPLE_TEAM_ID = "YOUR_APPLE_TEAM_ID"
+APPLE_WEB_CLIENT_ID = "com.expoluciaauth.web"
 ENV = "development"
+GITHUB_CLIENT_ID = "Ov23li7350aQJ11Ok7nK"
+GITHUB_CLIENT_SECRET = "13ad6e16a275c8abef450660bc4ed0affc81e065"
+GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"
+GOOGLE_CLIENT_SECRET = "YOUR_GOOGLE_CLIENT_SECRET"
+MY_VAR = "my-variable"
+RATE_LIMITER = "5"
+WEB_DOMAIN = "http://localhost:8081"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
