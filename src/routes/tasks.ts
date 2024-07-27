@@ -1,4 +1,6 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 type Task = {
 	id: number;
@@ -12,12 +14,18 @@ const fakeTasks: Task[] = [
 	{ id: 3, title: "Clean room 3", content: "now 3" },
 ];
 
+const createTaskSchema = z.object({
+	title: z.string(),
+	content: z.string(),
+});
+
 export const tasksRoute = new Hono()
 	.get("/", c => {
 		return c.json({ expenses: fakeTasks });
 	})
-	.post("/", async c => {
-		const tasks = await c.req.json();
+	.post("/", zValidator("json", createTaskSchema), async c => {
+		const tasks = await c.req.valid("json");
+		fakeTasks.push({ id: fakeTasks.length + 1, ...tasks });
 		return c.json(tasks);
 	});
 // .delete
