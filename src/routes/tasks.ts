@@ -2,22 +2,21 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-type Task = {
-	id: number;
-	title: string;
-	content: string;
-};
+const taskSchema = z.object({
+	id: z.number().int().positive().min(1),
+	title: z.string().min(3).max(100),
+	content: z.string().min(3).max(200),
+});
+
+type Task = z.infer<typeof taskSchema>;
+
+const createTaskSchema = taskSchema.omit({ id: true });
 
 const fakeTasks: Task[] = [
 	{ id: 1, title: "Clean room 1", content: "now 1" },
 	{ id: 2, title: "Clean room 2", content: "now 2" },
 	{ id: 3, title: "Clean room 3", content: "now 3" },
 ];
-
-const createTaskSchema = z.object({
-	title: z.string(),
-	content: z.string(),
-});
 
 export const tasksRoute = new Hono()
 	.get("/", c => {
