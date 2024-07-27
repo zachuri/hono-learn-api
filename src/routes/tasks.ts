@@ -27,6 +27,18 @@ export const tasksRoute = new Hono()
 		const tasks = await c.req.valid("json");
 		fakeTasks.push({ id: fakeTasks.length + 1, ...tasks });
 		return c.json(tasks);
+	})
+	// Regex to make sure its number
+	.get("/:id{[0-9]+}", c => {
+		const id = Number.parseInt(c.req.param("id"));
+
+		const task = fakeTasks.find(task => task.id === id);
+
+		if (!task) {
+			return c.notFound();
+		}
+
+		return c.json({ task });
 	});
 // .delete
 // .put
