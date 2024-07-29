@@ -18,7 +18,7 @@ config({
 import { defineConfig } from "drizzle-kit";
 export default defineConfig({
 	dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
-	schema: "./src/config/db/schema.ts", //separate the schemas
+	schema: "./src/db/schema.ts", //separate the schemas
 	out: "./drizzle",
 	dbCredentials: {
 		url: process.env.DATABASE_URL!,
