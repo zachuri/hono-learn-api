@@ -1,5 +1,4 @@
 import { initializeDB } from "@/db";
-// import { routes } from "@/routes";
 import { ApiError } from "@/utils/ApiError";
 import { AppContext } from "@/utils/context";
 import { sentry } from "@hono/sentry";
@@ -12,6 +11,7 @@ import { authRoute } from "./routes/auth";
 import { tasksRoute } from "./routes/tasks";
 import { userRoute } from "./routes/user";
 import { initializeLucia } from "./utils/lucia";
+import { AuthMiddleware } from './middlewares/auth.middleware';
 
 const app = new Hono<AppContext>();
 
@@ -23,7 +23,7 @@ app
 		throw new ApiError(httpStatus.NOT_FOUND, "Not found");
 	})
 	.onError(errorHandler)
-	// .use(AuthMiddleware)
+	.use(AuthMiddleware)
 	.use((c, next) => {
 		initializeDB(c);
 		initializeLucia(c);
@@ -31,16 +31,7 @@ app
 	});
 
 app.get("/", async c => {
-	try {
-		const db = c.get("db");
-
-		console.log("DB CALLED INSERT", db);
-		const data = await db.query.taskTable.findMany();
-		console.log(data);
-		return c.json("My First Hono API");
-	} catch (error) {
-		console.log(error);
-	}
+	return c.json("My First Hono API");
 });
 
 const apiRoutes = app
