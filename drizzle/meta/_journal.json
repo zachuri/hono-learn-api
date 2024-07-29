@@ -8,6 +8,13 @@
       "when": 1720507104484,
       "tag": "0000_big_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1722223205687,
+      "tag": "0001_high_shatterstar",
+      "breakpoints": true
     }
   ]
 }
