@@ -1,9 +1,9 @@
 import type { Lucia, Session, User } from "lucia";
 
-import { Database } from "../db/index.js";
+import { Database } from "@/db/index";
 import { UserTable } from "../db/schema.js";
 import type { Env } from "./env.ts";
-import { DatabaseUserAttributes, initializeLucia } from "./lucia.js";
+import { DatabaseUserAttributes, initializeLucia } from "./lucia";
 
 type Variables = {
 	db: Database;

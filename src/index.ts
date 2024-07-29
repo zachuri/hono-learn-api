@@ -1,5 +1,4 @@
 import { initializeDB } from "@/db";
-import authRoute from "@/routes/auth/index";
 // import { routes } from "@/routes";
 import { ApiError } from "@/utils/ApiError";
 import { AppContext } from "@/utils/context";
@@ -9,7 +8,9 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
 import { errorHandler } from "./middlewares/error";
+import { authRoute } from "./routes/auth";
 import { tasksRoute } from "./routes/tasks";
+import { userRoute } from "./routes/user";
 import { initializeLucia } from "./utils/lucia";
 
 const app = new Hono<AppContext>();
@@ -45,7 +46,9 @@ app.get("/", async c => {
 const apiRoutes = app
 	// .basePath("/api")
 	.route("/tasks", tasksRoute)
-	.route("/auth", authRoute);
+	.route("/auth", authRoute)
+	.route("/user", userRoute);
+
 export type ApiRoutes = typeof apiRoutes;
 
 export default app;
