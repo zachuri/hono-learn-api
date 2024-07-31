@@ -1,15 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
-import { generateState } from "arctic";
+import { generateCodeVerifier, generateState } from "arctic";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { getCookie, setCookie } from "hono/cookie";
-import type { Session } from "lucia";
+import { verifyRequestOrigin, type Session } from "lucia";
 import { z } from "zod";
 
 import type { AppContext } from "../../utils/context";
-// import { createAppleSession, getAppleAuthorizationUrl } from "./apple";
+import { createAppleSession, getAppleAuthorizationUrl } from "./apple";
 import { createGithubSession, getGithubAuthorizationUrl } from "./github";
-// import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";
+import { createGoogleSession, getGoogleAuthorizationUrl } from "./google";
 
 export const authRoute = new Hono<AppContext>()
 	.get(
@@ -25,7 +25,7 @@ export const authRoute = new Hono<AppContext>()
 					redirect: z.enum([
 						"com.expoluciaauth.app://",
 						"http://localhost:8081",
-						"https://hono-learn-api.zachuri.workers.dev",
+						"https://expo-lucia-auth-example-web.pages.dev",
 					]),
 					sessionToken: z.string().optional(),
 				})
@@ -63,34 +63,33 @@ export const authRoute = new Hono<AppContext>()
 					secure: env(c).WORKER_ENV === "production",
 				});
 				return c.redirect(url.toString());
+			} else if (provider === "google") {
+				const codeVerifier = generateCodeVerifier();
+				const url = await getGoogleAuthorizationUrl({ c, state, codeVerifier });
+				setCookie(c, "google_oauth_state", state, {
+					httpOnly: true,
+					maxAge: 60 * 10,
+					path: "/",
+					secure: env(c).WORKER_ENV === "production",
+				});
+				setCookie(c, "google_oauth_code_verifier", codeVerifier, {
+					httpOnly: true,
+					maxAge: 60 * 10,
+					path: "/",
+					secure: env(c).WORKER_ENV === "production",
+				});
+				return c.redirect(url.toString());
+			} else if (provider === "apple") {
+				const url = await getAppleAuthorizationUrl({ c, state });
+				setCookie(c, "apple_oauth_state", state, {
+					httpOnly: true,
+					maxAge: 60 * 10,
+					path: "/",
+					secure: env(c).WORKER_ENV === "production",
+					sameSite: "None",
+				});
+				return c.redirect(url.toString());
 			}
-			// else if (provider === "google") {
-			// 	const codeVerifier = generateCodeVerifier();
-			// 	const url = await getGoogleAuthorizationUrl({ c, state, codeVerifier });
-			// 	setCookie(c, "google_oauth_state", state, {
-			// 		httpOnly: true,
-			// 		maxAge: 60 * 10,
-			// 		path: "/",
-			// 		secure: env(c).WORKER_ENV === "production",
-			// 	});
-			// 	setCookie(c, "google_oauth_code_verifier", codeVerifier, {
-			// 		httpOnly: true,
-			// 		maxAge: 60 * 10,
-			// 		path: "/",
-			// 		secure: env(c).WORKER_ENV === "production",
-			// 	});
-			// 	return c.redirect(url.toString());
-			// } else if (provider === "apple") {
-			// 	const url = await getAppleAuthorizationUrl({ c, state });
-			// 	setCookie(c, "apple_oauth_state", state, {
-			// 		httpOnly: true,
-			// 		maxAge: 60 * 10,
-			// 		path: "/",
-			// 		secure: env(c).WORKER_ENV === "production",
-			// 		sameSite: "None",
-			// 	});
-			// 	return c.redirect(url.toString());
-			// }
 			return c.json({}, 400);
 		}
 	)
@@ -144,60 +143,58 @@ export const authRoute = new Hono<AppContext>()
 					const redirectUrl = new URL(redirect);
 					redirectUrl.searchParams.append("token", session.id);
 					return c.redirect(redirectUrl.toString());
+				} else if (provider === "google") {
+					const session = await createGoogleSession({
+						c,
+						idToken: code,
+						codeVerifier: codeVerifierCookie!,
+						sessionToken: sessionTokenCookie,
+					});
+					if (!session) {
+						return c.json({}, 400);
+					}
+					const redirectUrl = new URL(redirect);
+					redirectUrl.searchParams.append("token", session.id);
+					return c.redirect(redirectUrl.toString());
+				} else if (provider === "apple") {
+					const originHeader = c.req.header("Origin");
+					const hostHeader = c.req.header("Host");
+					if (
+						!originHeader ||
+						!hostHeader ||
+						!verifyRequestOrigin(originHeader, [
+							hostHeader,
+							"appleid.apple.com",
+						])
+					) {
+						return c.json({}, 403);
+					}
+					const formData = await c.req.formData();
+					const userJSON = formData.get("user"); // only available first time
+					let user: { username: string } | undefined;
+					if (userJSON) {
+						const reqUser = JSON.parse(userJSON) as {
+							name: { firstName: string; lastName: string };
+							email: string;
+						};
+						user = {
+							username: `${reqUser.name.firstName} ${reqUser.name.lastName}`,
+						};
+					}
+					const session = await createAppleSession({
+						c,
+						code,
+						user,
+						sessionToken: sessionTokenCookie,
+					});
+					if (!session) {
+						return c.json({}, 400);
+					}
+					// always web
+					const redirectUrl = new URL(redirect);
+					redirectUrl.searchParams.append("token", session.id);
+					return c.redirect(redirectUrl.toString());
 				}
-				// else if (provider === "google") {
-				// 	const session = await createGoogleSession({
-				// 		c,
-				// 		idToken: code,
-				// 		codeVerifier: codeVerifierCookie!,
-				// 		sessionToken: sessionTokenCookie,
-				// 	});
-				// 	if (!session) {
-				// 		return c.json({}, 400);
-				// 	}
-				// 	const redirectUrl = new URL(redirect);
-				// 	redirectUrl.searchParams.append("token", session.id);
-				// 	return c.redirect(redirectUrl.toString());
-				// }
-				// else if (provider === "apple") {
-				// 	const originHeader = c.req.header("Origin");
-				// 	const hostHeader = c.req.header("Host");
-				// 	if (
-				// 		!originHeader ||
-				// 		!hostHeader ||
-				// 		!verifyRequestOrigin(originHeader, [
-				// 			hostHeader,
-				// 			"appleid.apple.com",
-				// 		])
-				// 	) {
-				// 		return c.json({}, 403);
-				// 	}
-				// 	const formData = await c.req.formData();
-				// 	const userJSON = formData.get("user"); // only available first time
-				// 	let user: { username: string } | undefined;
-				// 	if (userJSON) {
-				// 		const reqUser = JSON.parse(userJSON) as {
-				// 			name: { firstName: string; lastName: string };
-				// 			email: string;
-				// 		};
-				// 		user = {
-				// 			username: `${reqUser.name.firstName} ${reqUser.name.lastName}`,
-				// 		};
-				// 	}
-				// 	const session = await createAppleSession({
-				// 		c,
-				// 		code,
-				// 		user,
-				// 		sessionToken: sessionTokenCookie,
-				// 	});
-				// 	if (!session) {
-				// 		return c.json({}, 400);
-				// 	}
-				// 	// always web
-				// 	const redirectUrl = new URL(redirect);
-				// 	redirectUrl.searchParams.append("token", session.id);
-				// 	return c.redirect(redirectUrl.toString());
-				// }
 				return c.json({}, 400);
 			} catch (error) {
 				console.error(error);
@@ -234,22 +231,21 @@ export const authRoute = new Hono<AppContext>()
 			let session: Session | null = null;
 			if (provider === "github") {
 				session = await createGithubSession({ c, idToken, sessionToken });
+			} else if (provider === "google") {
+				session = await createGoogleSession({
+					c,
+					idToken,
+					codeVerifier: "",
+					sessionToken,
+				});
+			} else if (provider === "apple") {
+				session = await createAppleSession({
+					c,
+					idToken,
+					user: c.req.valid("json").user,
+					sessionToken,
+				});
 			}
-			// else if (provider === "google") {
-			// 	session = await createGoogleSession({
-			// 		c,
-			// 		idToken,
-			// 		codeVerifier: "",
-			// 		sessionToken,
-			// 	});
-			// } else if (provider === "apple") {
-			// 	session = await createAppleSession({
-			// 		c,
-			// 		idToken,
-			// 		user: c.req.valid("json").user,
-			// 		sessionToken,
-			// 	});
-			// }
 			if (!session) {
 				return c.json({}, 400);
 			}

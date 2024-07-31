@@ -32,7 +32,7 @@ export const initializeLucia = (c: Context<AppContext>) => {
 				username: attributes.username,
 				email: attributes.email,
 				emailVerified: attributes.emailVerified,
-				image: attributes.image,
+				profilePictureUrl: attributes.profilePictureUrl,
 			};
 		},
 	});

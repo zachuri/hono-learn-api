@@ -6,12 +6,12 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
+import { AuthMiddleware } from "./middlewares/auth.middleware";
 import { errorHandler } from "./middlewares/error";
 import { authRoute } from "./routes/auth";
 import { tasksRoute } from "./routes/tasks";
 import { userRoute } from "./routes/user";
 import { initializeLucia } from "./utils/lucia";
-import { AuthMiddleware } from './middlewares/auth.middleware';
 
 const app = new Hono<AppContext>();
 
@@ -23,12 +23,12 @@ app
 		throw new ApiError(httpStatus.NOT_FOUND, "Not found");
 	})
 	.onError(errorHandler)
-	.use(AuthMiddleware)
 	.use((c, next) => {
 		initializeDB(c);
 		initializeLucia(c);
 		return next();
-	});
+	})
+	.use(AuthMiddleware);
 
 app.get("/", async c => {
 	return c.json("My First Hono API");

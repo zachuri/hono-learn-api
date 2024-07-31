@@ -10,9 +10,10 @@ export const AuthMiddleware = async (
 	c: Context<AppContext>,
 	next: () => Promise<void>
 ) => {
-	if (c.req.path.startsWith("/api/auth")) {
+	if (c.req.path.startsWith("/auth")) {
 		return next();
 	}
+
 	const lucia = c.get("lucia");
 
 	const originHeader = c.req.header("Origin") ?? c.req.header("origin");
@@ -30,12 +31,18 @@ export const AuthMiddleware = async (
 	}
 
 	const authorizationHeader = c.req.header("Authorization");
-	const bearerSessionId = lucia.readBearerToken(authorizationHeader ?? "");
+
+	console.log("MIDDLEWARE" + authorizationHeader);
+
+	const bearerSessionId = lucia.readBearerToken(authorizationHeader!);
+
+	console.log("MIDDLEWARE" + bearerSessionId);
 	const sessionId = bearerSessionId;
 	if (!sessionId) {
 		return new Response("Unauthorized", { status: 401 });
 	}
 	const { session, user } = await lucia.validateSession(sessionId);
+
 	if (!session) {
 		return new Response("Unauthorized", { status: 401 });
 	}
@@ -43,6 +50,7 @@ export const AuthMiddleware = async (
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		c.header("Set-Cookie", sessionCookie.serialize());
 	}
+
 	c.set("user", user as User & DatabaseUserAttributes);
 	c.set("session", session);
 	await next();

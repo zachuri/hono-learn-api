@@ -1,4 +1,4 @@
-import { GitHub } from "arctic";
+import { Google } from "arctic";
 import type { Context } from "hono";
 import { env } from "hono/adapter";
 import { generateId } from "lucia";
@@ -8,67 +8,60 @@ import { userTable } from "@/db/table/users";
 import type { AppContext } from "@/utils/context";
 import type { DatabaseUserAttributes } from "@/utils/lucia";
 
-const githubClient = (c: Context<AppContext>) =>
-	new GitHub(env(c).GITHUB_CLIENT_ID, env(c).GITHUB_CLIENT_SECRET);
+const googleClient = (c: Context<AppContext>) =>
+	new Google(
+		env(c).GOOGLE_CLIENT_ID,
+		env(c).GOOGLE_CLIENT_SECRET,
+		`${env(c).API_DOMAIN}/auth/google/callback`
+	);
 
-export const getGithubAuthorizationUrl = async ({
+export const getGoogleAuthorizationUrl = async ({
 	c,
 	state,
+	codeVerifier,
 }: {
 	c: Context<AppContext>;
 	state: string;
+	codeVerifier: string;
 }) => {
-	const github = githubClient(c);
-	return await github.createAuthorizationURL(state, {
-		scopes: ["read:user", "user:email"],
+	const google = googleClient(c);
+	const url = await google.createAuthorizationURL(state, codeVerifier, {
+		scopes: ["profile", "email"],
 	});
+	return url.toString();
 };
 
-export const createGithubSession = async ({
+export const createGoogleSession = async ({
 	c,
 	idToken,
+	codeVerifier,
 	sessionToken,
 }: {
 	c: Context<AppContext>;
 	idToken: string;
+	codeVerifier: string;
 	sessionToken?: string;
 }) => {
-	const github = githubClient(c);
-	const tokens = await github.validateAuthorizationCode(idToken);
-	const githubUserResponse = await fetch("https://api.github.com/user", {
-		headers: {
-			"User-Agent": "hono",
-			Authorization: `Bearer ${tokens.accessToken}`,
-		},
-	});
+	const google = googleClient(c);
 
-	const githubUserResult: {
-		id: number;
-		login: string; // username
+	const tokens = await google.validateAuthorizationCode(idToken, codeVerifier);
+	const response = await fetch(
+		"https://openidconnect.googleapis.com/v1/userinfo",
+		{
+			headers: {
+				Authorization: `Bearer ${tokens.accessToken}`,
+			},
+		}
+	);
+	const user: {
+		sub: string;
 		name: string;
-		avatar_url: string;
-	} = await githubUserResponse.json();
-
-	const userEmailResponse = await fetch("https://api.github.com/user/emails", {
-		headers: {
-			"User-Agent": "hono",
-			Authorization: `Bearer ${tokens.accessToken}`,
-		},
-	});
-
-	const userEmailResult: {
 		email: string;
-		primary: boolean;
-		verified: boolean;
-	}[] = await userEmailResponse.json();
-
-	const primaryEmail = userEmailResult.find(email => email.primary);
-	if (!primaryEmail) {
-		return null;
-	}
+		email_verified: boolean;
+		picture: string;
+	} = await response.json();
 	const existingAccount = await c.get("db").query.oauthAccountTable.findFirst({
-		where: (account, { eq }) =>
-			eq(account.providerUserId, githubUserResult.id.toString()),
+		where: (account, { eq }) => eq(account.providerUserId, user.sub.toString()),
 	});
 	let existingUser: DatabaseUserAttributes | null = null;
 	if (sessionToken) {
@@ -78,20 +71,16 @@ export const createGithubSession = async ({
 		}
 	} else {
 		const response = await c.get("db").query.userTable.findFirst({
-			where: (u, { eq }) => eq(u.email, primaryEmail.email),
+			where: (u, { eq }) => eq(u.email, user.email),
 		});
 		if (response) {
 			existingUser = response;
 		}
 	}
-	if (
-		existingUser?.emailVerified &&
-		primaryEmail.verified &&
-		!existingAccount
-	) {
+	if (existingUser?.emailVerified && user.email_verified && !existingAccount) {
 		await c.get("db").insert(oauthAccountTable).values({
-			providerUserId: githubUserResult.id.toString(),
-			provider: "github",
+			providerUserId: user.sub,
+			provider: "google",
 			userId: existingUser.id,
 		});
 		const session = await c.get("lucia").createSession(existingUser.id, {});
@@ -105,7 +94,7 @@ export const createGithubSession = async ({
 		return session;
 	} else {
 		const userId = generateId(15);
-		let username = githubUserResult.login;
+		let username = user.name;
 		const existingUsername = await c.get("db").query.userTable.findFirst({
 			where: (u, { eq }) => eq(u.username, username),
 		});
@@ -118,13 +107,13 @@ export const createGithubSession = async ({
 			.values({
 				id: userId,
 				username,
-				profilePictureUrl: githubUserResult.avatar_url,
-				email: primaryEmail.email ?? "",
-				emailVerified: primaryEmail.verified ? 1 : 0,
+				email: user.email,
+				emailVerified: user.email_verified ? 1 : 0,
+				profilePictureUrl: user.picture,
 			});
 		await c.get("db").insert(oauthAccountTable).values({
-			providerUserId: githubUserResult.id.toString(),
-			provider: "github",
+			providerUserId: user.sub,
+			provider: "google",
 			userId,
 		});
 		const session = await c.get("lucia").createSession(userId, {});

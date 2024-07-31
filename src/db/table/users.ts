@@ -18,7 +18,7 @@ export const userTable = pgTable(
 		name: text("name"),
 		email: text("email").notNull(),
 		emailVerified: integer("email_verified").notNull(),
-		image: text("image"),
+		profilePictureUrl: text("image"),
 		role: roleEnum("role").notNull().default("user"),
 		username: varchar("username", { length: 60 }),
 		phoneNumber: varchar("phone_number", { length: 20 }),
