@@ -1,4 +1,4 @@
-import { Environment } from "@/types/bindings";
+import { AppContext } from "@/utils/context";
 import dayjs from "dayjs";
 import { Context, MiddlewareHandler } from "hono";
 import httpStatus from "http-status";
@@ -41,7 +41,7 @@ const setRateLimitHeaders = (
 export const rateLimit = (
 	interval: number,
 	limit: number
-): MiddlewareHandler<Environment> => {
+): MiddlewareHandler<AppContext> => {
 	return async (c, next) => {
 		const key = getRateLimitKey(c);
 		const endpoint = new URL(c.req.url).pathname;
