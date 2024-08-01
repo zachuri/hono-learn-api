@@ -1,7 +1,7 @@
-import type { AppType } from "@my/api/src/index";
+import type { AppType } from "@my/api/src";
 import { hc } from "hono/client";
 
-const API_URL = process.env['EXPO_PUBLIC_API_URL']!;
+const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
 class ApiClientSingleton {
   public client = hc<AppType>(API_URL);

@@ -1,4 +1,3 @@
-import { resolve } from 'node:path'
 import { withTamagui } from '@tamagui/metro-plugin'
 // Learn more https://docs.expo.dev/guides/monorepos
 // Learn more https://docs.expo.io/guides/customizing-metro
@@ -8,12 +7,24 @@ import { getDefaultConfig } from 'expo/metro-config'
 // Find the project and workspace directories
 const projectRoot = __dirname
 // This can be replaced with `find-yarn-workspace-root`
-const workspaceRoot = resolve(projectRoot, '../..')
+const workspaceRoot = resolve(projectRoot, '../../')
 
 const config = getDefaultConfig(projectRoot, {
   // [Web-only]: Enables CSS support in Metro.
   isCSSEnabled: true,
 })
+
+// for hono/client to work because unstable_enablePackageExports is not working
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === "hono/client") {
+    console.log(`Resolving custom path for: ${moduleName}`);
+    return {
+      type: "sourceFile",
+      filePath: path.resolve(workspaceRoot, "node_modules/hono/dist/client/index.js"),
+    };
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot]
