@@ -1,7 +1,6 @@
 {
   "name": "expo-app",
-  "version": "0.3.1",
-  "main": "index.ts",
+  "version": "0.3.1", "main": "index.ts",
   "private": true,
   "scripts": {
     "android": "bunx expo run android",
@@ -41,6 +40,7 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-preset-expo": "^11.0.11",
+    "hono": "^4.2.8",
     "metro-minify-terser": "^0.80.9"
   }
 }

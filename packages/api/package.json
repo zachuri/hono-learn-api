@@ -1,5 +1,14 @@
 {
-  "scripts": {
+  "name": "@my/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "types": "./build/types/index.d.ts",
+"scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "db:generate": "drizzle-kit generate",
@@ -32,11 +41,5 @@
     "@types/bun": "latest",
     "drizzle-kit": "latest",
     "wrangler": "^3.47.0"
-  },
-  "name": "hono-learn-api",
-  "module": "index.ts",
-  "type": "module",
-  "peerDependencies": {
-    "typescript": "^5.0.0"
   }
 }

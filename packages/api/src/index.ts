@@ -34,12 +34,11 @@ app.get("/", async c => {
 	return c.json("My First Hono API");
 });
 
-const apiRoutes = app
+const routes = app
 	// .basePath("/api")
 	.route("/tasks", tasksRoute)
 	.route("/auth", authRoute)
 	.route("/user", userRoute);
 
-export type ApiRoutes = typeof apiRoutes;
-
+export type AppType = typeof routes;
 export default app;
